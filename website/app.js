@@ -1,12 +1,12 @@
 /* Global Variables */
-const API_KEY = "12069046be7b3bec6cfefe3a43889813";
+const apiKey = "12069046be7b3bec6cfefe3a43889813&units=metric";
 const getWeatherDataEndPoint = "/getweatherdata";
 const postWeatherDataEndPoint = "/addweatherdata";
 const baseUrl = "https://api.openweathermap.org/data/2.5/weather?";
 
 // Create a new date instance dynamically with JS
 let d = new Date();
-let newDate = d.getMonth() + '.' + d.getDate() + '.' + d.getFullYear();
+let newDate = d.getMonth() + 1 + "/" + d.getDate() + "/" + d.getFullYear()
 
 //event 
 document.getElementById('generate').addEventListener('click', performAction);
@@ -15,20 +15,20 @@ function performAction(e) {
     const feelings = document.getElementById('feelings').value;
     const zipCode = document.getElementById('zip').value;
 
-    getOpenMapWetherDataByZipCode(baseUrl,zipCode,API_KEY)
+    getOpenMapWetherDataByZipCode(baseUrl, zipCode, apiKey)
         .then((data) =>
             postWeatherData(postWeatherDataEndPoint, { "temperature": data.main.temp, "date": newDate, "feelings": feelings }))
-        .then(() => getWetherJournalData());
+        .then(() => getWetherJournalData(getWeatherDataEndPoint));
 }
 
 //Get weather data from openMapWehater APP
 const getOpenMapWetherDataByZipCode = async (baseUrl, zipCode, apiKey) => {
-    const openMapWehaterUri = `${baseUrl}zip=${zipCode},us&appid=${apiKey}&units=metric`;
+    const openMapWehaterUri = `${baseUrl}zip=${zipCode},us&appid=${apiKey}`;
 
     const res = await fetch(openMapWehaterUri);
     try {
         const data = await res.json();
-        return data;    
+        return data;
     } catch (error) {
         console.log("error", error);
     }
@@ -41,7 +41,7 @@ const postWeatherData = async (url = '', data = {}) => {
         method: 'POST',
         credentials: 'same-origin',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
     });
@@ -56,13 +56,13 @@ const postWeatherData = async (url = '', data = {}) => {
 
 //Get weather request
 
-const getWetherJournalData = async () => {
-    const res = await fetch(getWeatherDataEndPoint);
+const getWetherJournalData = async (url = '') => {
+    const res = await fetch(url);
     try {
         const data = await res.json();
-        document.getElementById('temp').innerHTML = "Current Temperatuer is: " + data[0].temperature;
-        document.getElementById('date').innerHTML = "Date: " + data[0].date;
-        document.getElementById('content').innerHTML = "User Feeling: " + data[0].feelings;
+        document.getElementById('temp').innerHTML = "Current Temperatuer is: " + data.temperature + ' degrees';
+        document.getElementById('date').innerHTML = "Date: " + data.date;
+        document.getElementById('content').innerHTML = "User Feeling: " + data.feelings;
     } catch (error) {
         console.log("error", error);
     }
